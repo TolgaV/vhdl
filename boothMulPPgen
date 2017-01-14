@@ -1,0 +1,206 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity ppGenerator is
+    Port ( multiplicand : in  STD_LOGIC_VECTOR (15 downto 0);
+           multiplier : in  STD_LOGIC_VECTOR (15 downto 0);
+           PP0 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP1 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP2 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP3 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP4 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP5 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP6 : out  STD_LOGIC_VECTOR (16 downto 0);
+           PP7 : out  STD_LOGIC_VECTOR (16 downto 0);
+           signs : out  STD_LOGIC_VECTOR (7 downto 0);
+			  sig : out  STD_LOGIC_VECTOR (7 downto 0));
+end ppGenerator;
+
+architecture hybrid of ppGenerator is
+
+	component encoder is
+		Port ( multiplier : in  STD_LOGIC_VECTOR (15 downto 0);
+           sel1 : out  STD_LOGIC_VECTOR (7 downto 0);
+           sel2 : out  STD_LOGIC_VECTOR (7 downto 0);
+           sign : out  STD_LOGIC_VECTOR (7 downto 0));
+	end component;
+
+
+signal multplcnd : std_logic_vector(15 downto 0);
+--signal sig: std_logic_vector(7 downto 0);
+signal select1: std_logic_vector(7 downto 0);
+signal select2: std_logic_vector(7 downto 0);
+signal p0, p1, p2, p3, p4, p5, p6, p7 : std_logic_vector(16 downto 0) := "00000000000000000";
+signal zero: std_logic_vector(15 downto 0) := "0000000000000000";
+signal signPP: std_logic_vector(7 downto 0);	--for keeping sign for negative transer
+
+begin
+
+multplcnd(15 downto 0)	<= multiplicand(15 downto 0);
+sig(7 downto 0) 			<= sel1(7 downto 0);
+select1(7 downto 0) 		<= sel2(7 downto 0);
+select2(7 downto 0) 		<= sign(7 downto 0);
+--p0(15 downto 0) 			<= PP0(15 downto 0);
+--p1(15 downto 0) 			<= PP1(15 downto 0);
+--p2(15 downto 0) 			<= PP2(15 downto 0);
+--p3(15 downto 0) 			<= PP3(15 downto 0);
+--p4(15 downto 0)				<= PP4(15 downto 0);
+--p5(15 downto 0) 			<= PP5(15 downto 0);
+--p6(15 downto 0) 			<= PP6(15 downto 0);
+--p7(15 downto 0) 			<= PP7(15 downto 0);
+PP0(16 downto 0) <= p0(16 downto 0);
+PP1(16 downto 0) <= p1(16 downto 0);
+PP2(16 downto 0) <= p2(16 downto 0);
+PP3(16 downto 0) <= p3(16 downto 0);
+PP4(16 downto 0) <= p4(16 downto 0);
+PP5(16 downto 0) <= p5(16 downto 0);
+PP6(16 downto 0) <= p6(16 downto 0);
+PP7(16 downto 0) <= p7(16 downto 0);
+
+
+ppGen: process (multplcnd, sel1, sel2, sign)
+	begin
+	ppLoop: for i in 0 to 7 loop
+			if (sig(i) = '0') then
+			--case sel1=0 sel2=0 : zero TOTALLY REDUNDANT BRANCH
+					if ((select1(i) = '0') and ((select2(i) = '0'))) then
+							if (i = '0') then
+								p0(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '1') then
+								p1(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '2') then
+								p2(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '3') then
+								p3(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '4') then
+								p4(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '5') then
+								p5(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '6') then
+								p6(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '7') then
+								p7(15 downto 0) <= zero(15 downto 0);
+							end if;
+			--case sel1=1 sel2=0 : transfer
+					elsif ((select1(i) = '1') and ((select2(i) = '0'))) then
+							if (i = '0') then
+								p0(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '1') then
+								p1(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '2') then
+								p2(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '3') then
+								p3(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '4') then
+								p4(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '5') then
+								p5(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '6') then
+								p6(15 downto 0) <= multplcnd(15 downto 0);
+							elsif (i = '7') then
+								p7(15 downto 0) <= multplcnd(15 downto 0);
+							end if;
+			--case sel1=0 sel2=1 : shift
+					elsif ((select1(i) = '0') and ((select2(i) = '1'))) then
+							if (i = '0') then
+								p0(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '1') then
+								p1(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '2') then
+								p2(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '3') then
+								p3(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '4') then
+								p4(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '5') then
+								p5(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '6') then
+								p6(16 downto 1) <= multplcnd(15 downto 0);
+							elsif (i = '7') then
+								p7(16 downto 1) <= multplcnd(15 downto 0);
+							end if;
+					end if;
+					
+			--case where sign is 1
+			elsif (sig(i) = '1') then
+					if ((select1(i) = '0') and ((select2(i) = '0'))) then
+							if (i = '0') then
+								p0(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '1') then
+								p1(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '2') then
+								p2(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '3') then
+								p3(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '4') then
+								p4(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '5') then
+								p5(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '6') then
+								p6(15 downto 0) <= zero(15 downto 0);
+							elsif (i = '7') then
+								p7(15 downto 0) <= zero(15 downto 0);
+							end if;
+			--case sel1=1 sel2=0 : transfer negative
+					elsif ((select1(i) = '1') and ((select2(i) = '0'))) then
+							if (i = '0') then
+								p0(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '1') then
+								p1(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '2') then
+								p2(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '3') then
+								p3(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '4') then
+								p4(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '5') then
+								p5(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '6') then
+								p6(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							elsif (i = '7') then
+								p7(15 downto 0) <= not multplcnd(15 downto 0);
+								signPP(i) <= '1';
+							end if;
+			--case sel1=0 sel2=1 : shift negative
+					elsif ((select1(i) = '0') and ((select2(i) = '1'))) then
+							if (i = '0') then
+								p0(16 downto 1) <= not multplcnd(15 downto 0);
+								p0(0) <= '1';
+							elsif (i = '1') then
+								p1(16 downto 1) <= not multplcnd(15 downto 0);
+								p1(0) <= '1';
+							elsif (i = '2') then
+								p2(16 downto 1) <= not multplcnd(15 downto 0);
+								p2(0) <= '1';
+							elsif (i = '3') then
+								p3(16 downto 1) <= not multplcnd(15 downto 0);
+								p3(0) <= '1';
+							elsif (i = '4') then
+								p4(16 downto 1) <= not multplcnd(15 downto 0);
+								p4(0) <= '1';
+							elsif (i = '5') then
+								p5(16 downto 1) <= not multplcnd(15 downto 0);
+								p5(0) <= '1';
+							elsif (i = '6') then
+								p6(16 downto 1) <= not multplcnd(15 downto 0);
+								p6(0) <= '1';
+							elsif (i = '7') then
+								p7(16 downto 1) <= not multplcnd(15 downto 0);
+								p7(0) <= '1';
+							end if;
+					end if;
+				end if;
+			end loop;
+		end process;
+		
+u0 : encoder port map(multiplier, select1, select2, sig);
+
+		
+end hybrid;
